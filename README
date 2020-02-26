@@ -6,6 +6,9 @@ which precompute the sum of pixels to the left and above each
 pixel, which can make several common image processing
 operations much faster.
 
+This is a Go package, and can be installed in the standard go way,
+by running `go get rescribe.xyz/integralimg` once go is installed.
+
 # Bugs
 
 The standard deviation and mean functions don't produce precisely
