@@ -9,23 +9,23 @@ operations much faster.
 This is a Go package, and can be installed in the standard go way,
 by running `go get rescribe.xyz/integralimg` once go is installed.
 
-# Bugs
+## Bugs
 
 The standard deviation and mean functions don't produce precisely
 the same result as those run on non integral images. The difference
 is small enough that it has little effect for most uses, but it
 ought to be identical.
 
-# TODO
+## TODO
 
 Write tests for the package.
 
-# Contributions
+## Contributions
 
 Any and all comments, bug reports, patches or pull requests would
 be very welcomely received. Please email them to <nick@rescribe.xyz>.
 
-# License
+## License
 
 This package is licensed under the GPLv3. See the LICENSE file for
 more details.
