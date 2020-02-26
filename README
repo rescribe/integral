@@ -1,0 +1,28 @@
+# rescribe.xyz/integralimg package
+
+This package contains methods and structures for dealing with
+Integral Images, aka Summed Area Tables. These are structures
+which precompute the sum of pixels to the left and above each
+pixel, which can make several common image processing
+operations much faster.
+
+# Bugs
+
+The standard deviation and mean functions don't produce precisely
+the same result as those run on non integral images. The difference
+is small enough that it has little effect for most uses, but it
+ought to be identical.
+
+# TODO
+
+Write tests for the package.
+
+# Contributions
+
+Any and all comments, bug reports, patches or pull requests would
+be very welcomely received. Please email them to <nick@rescribe.xyz>.
+
+# License
+
+This package is licensed under the GPLv3. See the LICENSE file for
+more details.
