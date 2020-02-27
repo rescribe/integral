@@ -7,7 +7,7 @@ pixel, which can make several common image processing
 operations much faster.
 
 This is a Go package, and can be installed in the standard go way,
-by running `go get rescribe.xyz/integralimg` once go is installed.
+by running `go get rescribe.xyz/integralimg`
 
 ## Bugs
 
