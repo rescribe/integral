@@ -2,6 +2,10 @@
 // Use of this source code is governed by the GPLv3
 // license that can be found in the LICENSE file.
 
+// integralimg is a package for processing integral images, aka
+// summed area tables. These are structures which precompute the
+// sum of pixels to the left and above each pixel, which can make
+// several common image processing operations much faster.
 package integralimg
 
 import (
