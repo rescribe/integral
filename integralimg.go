@@ -10,11 +10,39 @@ package integralimg
 
 import (
 	"image"
+	"image/color"
 	"math"
 )
 
 // I is the Integral Image
 type I [][]uint64
+
+func (i I) ColorModel() color.Model { return color.GrayModel }
+
+func (i I) Bounds() image.Rectangle {
+	return image.Rectangle {image.Point{0, 0}, image.Point{len(i[0]), len(i)}}
+}
+
+func (i I) At(x, y int) color.Color {
+	if !(image.Point{x, y}.In(i.Bounds())) {
+		return color.Gray{}
+	}
+
+	var oldx, oldy, oldxy uint64
+	oldx, oldy, oldxy = 0, 0, 0
+	if x > 0 {
+		oldx = i[y][x-1]
+	}
+	if y > 0 {
+		oldy = i[y-1][x]
+	}
+	if x > 0 && y > 0 {
+		oldxy = i[y-1][x-1]
+	}
+	orig := i[y][x] + oldxy - oldx - oldy
+
+	return color.Gray{uint8(orig)}
+}
 
 // Sq contains an Integral Image and its Square
 type WithSq struct {
