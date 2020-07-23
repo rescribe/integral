@@ -233,18 +233,6 @@ func (i I) GetVerticalWindow(x, width int) Window {
 	return Window { i[0][x], i[0][maxx], i[maxy][x], i[maxy][maxx], width, maxy }
 }
 
-// GetHorizontalWindow gets the values of the corners of a horizontal
-// slice of an Integral Image, starting at y
-func (i I) GetHorizontalWindow(y, height int) Window {
-	maxy := y + height
-	maxx := len(i[0]) - 1
-	if maxy > len(i) - 1 {
-		maxy = len(i) - 1
-	}
-
-	return Window { i[y][0], i[y][maxx], i[maxy][0], i[maxy][maxx], maxx, height }
-}
-
 // Sum returns the sum of all pixels in a Window
 func (w Window) Sum() uint64 {
 	return w.bottomright + w.topleft - w.topright - w.bottomleft
