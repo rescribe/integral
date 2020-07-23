@@ -113,12 +113,6 @@ func NewSqImage(r image.Rectangle) *SqImage {
 	return &s
 }
 
-// Sq contains an Integral Image and its Square
-type WithSq struct {
-	Img I
-	Sq I
-}
-
 // Window is a part of an Integral Image
 type Window struct {
 	topleft uint64
@@ -183,16 +177,6 @@ func ToSqIntegralImg(img *image.Gray) I {
 	}
 	return integral
 }
-
-// ToAllIntegralImg creates a WithSq containing a regular and
-// squared Integral Image
-func ToAllIntegralImg(img *image.Gray) WithSq {
-	var s WithSq
-	s.Img = ToIntegralImg(img)
-	s.Sq = ToSqIntegralImg(img)
-	return s
-}
-
 
 // GetWindow gets the values of the corners of a square part of an
 // Integral Image, plus the dimensions of the part, which can
@@ -264,17 +248,12 @@ func (w Window) Proportion() float64 {
 	return float64(area) / sum - 1
 }
 
-// MeanWindow calculates the mean value of a section of an Integral
-// Image
-func (i I) MeanWindow(x, y, size int) float64 {
-	return i.GetWindow(x, y, size).Mean()
-}
-
 // MeanStdDevWindow calculates the mean and standard deviation of
-// a section on an Integral Image
-func (i WithSq) MeanStdDevWindow(x, y, size int) (float64, float64) {
-	imean := i.Img.GetWindow(x, y, size).Mean()
-	smean := i.Sq.GetWindow(x, y, size).Mean()
+// a section on an Integral Image, using the corresponding Square
+// Integral Image.
+func MeanStdDevWindow(i I, sq SqImage, x, y, size int) (float64, float64) {
+	imean := i.GetWindow(x, y, size).Mean()
+	smean := sq.GetWindow(x, y, size).Mean()
 
 	variance := smean - (imean * imean)
 
