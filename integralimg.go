@@ -123,61 +123,6 @@ type Window struct {
 	height int
 }
 
-// ToIntegralImg creates an integral image
-func ToIntegralImg(img *image.Gray) I {
-	var integral I
-	var oldy, oldx, oldxy uint64
-	b := img.Bounds()
-	for y := b.Min.Y; y < b.Max.Y; y++ {
-		newrow := []uint64{}
-		for x := b.Min.X; x < b.Max.X; x++ {
-			oldx, oldy, oldxy = 0, 0, 0
-			if x > 0 {
-				oldx = newrow[x-1]
-			}
-			if y > 0 {
-				oldy = integral[y-1][x]
-			}
-			if x > 0 && y > 0 {
-				oldxy = integral[y-1][x-1]
-			}
-			pixel := uint64(img.GrayAt(x, y).Y)
-			i := pixel + oldx + oldy - oldxy
-			newrow = append(newrow, i)
-		}
-		integral = append(integral, newrow)
-	}
-	return integral
-}
-
-// ToSqIntegralImg creates an integral image of the square of all
-// pixel values
-func ToSqIntegralImg(img *image.Gray) I {
-	var integral I
-	var oldy, oldx, oldxy uint64
-	b := img.Bounds()
-	for y := b.Min.Y; y < b.Max.Y; y++ {
-		newrow := []uint64{}
-		for x := b.Min.X; x < b.Max.X; x++ {
-			oldx, oldy, oldxy = 0, 0, 0
-			if x > 0 {
-				oldx = newrow[x-1]
-			}
-			if y > 0 {
-				oldy = integral[y-1][x]
-			}
-			if x > 0 && y > 0 {
-				oldxy = integral[y-1][x-1]
-			}
-			pixel := uint64(img.GrayAt(x, y).Y)
-			i := pixel * pixel + oldx + oldy - oldxy
-			newrow = append(newrow, i)
-		}
-		integral = append(integral, newrow)
-	}
-	return integral
-}
-
 // GetWindow gets the values of the corners of a square part of an
 // Integral Image, plus the dimensions of the part, which can
 // be used to quickly calculate the mean of the area
