@@ -130,8 +130,8 @@ func (i Image) GetWindow(x, y, size int) Window {
 	step := size / 2
 
 	minx, miny := 0, 0
-	maxy := len(i)-1
-	maxx := len(i[0])-1
+	maxy := i.Bounds().Dy() - 1
+	maxx := i.Bounds().Dx() - 1
 
 	if y > (step+1) {
 		miny = y - step - 1
@@ -157,10 +157,11 @@ func (i SqImage) GetWindow(x, y, size int) Window {
 // GetVerticalWindow gets the values of the corners of a vertical
 // slice of an Integral Image, starting at x
 func (i Image) GetVerticalWindow(x, width int) Window {
-	maxy := len(i) - 1
+	maxy := i.Bounds().Dy() - 1
+	xbound := i.Bounds().Dx() - 1
 	maxx := x + width
-	if maxx > len(i[0])-1 {
-		maxx = len(i[0]) - 1
+	if maxx > xbound {
+		maxx = xbound
 	}
 
 	return Window { i[0][x], i[0][maxx], i[maxy][x], i[maxy][maxx], width, maxy }
@@ -188,9 +189,10 @@ func (w Window) Mean() float64 {
 // Proportion returns the proportion of pixels which are on
 func (w Window) Proportion() float64 {
 	area := w.width * w.height
-	// divide by 255 as each on pixel has the value of 255
-	sum := float64(w.Sum()) / 255
-	return float64(area) / sum - 1
+	// 1 << 16 - 1 as we're using Gray16, so for a binarised
+	// image then 1 << 16 - 1 = on
+	sum := float64(w.Sum()) / float64(1 << 16 - 1)
+	return float64(area) / float64(sum) - 1
 }
 
 // MeanStdDevWindow calculates the mean and standard deviation of
