@@ -14,8 +14,8 @@ import (
 	"math"
 )
 
-// I is the Integral Image
-type I [][]uint64
+// Image is an integral Image
+type Image [][]uint64
 
 // SqImage is a Square integral Image.
 // A squared integral image is an integral image for which the square of
@@ -23,16 +23,16 @@ type I [][]uint64
 // Standard Deviation.
 type SqImage [][]uint64
 
-func (i I) ColorModel() color.Model { return color.Gray16Model }
+func (i Image) ColorModel() color.Model { return color.Gray16Model }
 
-func (i I) Bounds() image.Rectangle {
+func (i Image) Bounds() image.Rectangle {
 	return image.Rectangle {image.Point{0, 0}, image.Point{len(i[0]), len(i)}}
 }
 
 // at64 is used to return the raw uint64 for a given pixel. Accessing
 // this separately to a (potentially lossy) conversion to a Gray16 is
 // necessary for SqImage to function accurately.
-func (i I) at64(x, y int) uint64 {
+func (i Image) at64(x, y int) uint64 {
 	if !(image.Point{x, y}.In(i.Bounds())) {
 		return 0
 	}
@@ -52,12 +52,12 @@ func (i I) at64(x, y int) uint64 {
 	return orig
 }
 
-func (i I) At(x, y int) color.Color {
+func (i Image) At(x, y int) color.Color {
 	c := i.at64(x, y)
 	return color.Gray16{uint16(c)}
 }
 
-func (i I) set64(x, y int, c uint64) {
+func (i Image) set64(x, y int, c uint64) {
 	var prevx, prevy, prevxy uint64
 	prevx, prevy, prevxy = 0, 0, 0
 	if x > 0 {
@@ -73,15 +73,15 @@ func (i I) set64(x, y int, c uint64) {
 	i[y][x] = final
 }
 
-func (i I) Set(x, y int, c color.Color) {
+func (i Image) Set(x, y int, c color.Color) {
 	gray := color.Gray16Model.Convert(c).(color.Gray16).Y
 	i.set64(x, y, uint64(gray))
 }
 
 // NewImage returns a new integral Image with the given bounds.
-func NewImage(r image.Rectangle) *I {
+func NewImage(r image.Rectangle) *Image {
 	w, h := r.Dx(), r.Dy()
-	var rows I
+	var rows Image
 	for i := 0; i < h; i++ {
 		col := make([]uint64, w)
 		rows = append(rows, col)
@@ -89,21 +89,21 @@ func NewImage(r image.Rectangle) *I {
 	return &rows
 }
 
-func (i SqImage) ColorModel() color.Model { return I(i).ColorModel() }
+func (i SqImage) ColorModel() color.Model { return Image(i).ColorModel() }
 
 func (i SqImage) Bounds() image.Rectangle {
-	return I(i).Bounds()
+	return Image(i).Bounds()
 }
 
 func (i SqImage) At(x, y int) color.Color {
-	c := I(i).at64(x, y)
+	c := Image(i).at64(x, y)
 	rt := math.Sqrt(float64(c))
 	return color.Gray16{uint16(rt)}
 }
 
 func (i SqImage) Set(x, y int, c color.Color) {
 	gray := uint64(color.Gray16Model.Convert(c).(color.Gray16).Y)
-	I(i).set64(x, y, gray * gray)
+	Image(i).set64(x, y, gray * gray)
 }
 
 // NewSqImage returns a new squared integral Image with the given bounds.
@@ -113,7 +113,7 @@ func NewSqImage(r image.Rectangle) *SqImage {
 	return &s
 }
 
-// Window is a part of an Integral Image
+// Window is a section of an Integral Image
 type Window struct {
 	topleft uint64
 	topright uint64
@@ -126,7 +126,7 @@ type Window struct {
 // GetWindow gets the values of the corners of a square part of an
 // Integral Image, plus the dimensions of the part, which can
 // be used to quickly calculate the mean of the area
-func (i I) GetWindow(x, y, size int) Window {
+func (i Image) GetWindow(x, y, size int) Window {
 	step := size / 2
 
 	minx, miny := 0, 0
@@ -151,12 +151,12 @@ func (i I) GetWindow(x, y, size int) Window {
 }
 
 func (i SqImage) GetWindow(x, y, size int) Window {
-	return I(i).GetWindow(x, y, size)
+	return Image(i).GetWindow(x, y, size)
 }
 
 // GetVerticalWindow gets the values of the corners of a vertical
 // slice of an Integral Image, starting at x
-func (i I) GetVerticalWindow(x, width int) Window {
+func (i Image) GetVerticalWindow(x, width int) Window {
 	maxy := len(i) - 1
 	maxx := x + width
 	if maxx > len(i[0])-1 {
@@ -167,7 +167,7 @@ func (i I) GetVerticalWindow(x, width int) Window {
 }
 
 func (i SqImage) GetVerticalWindow(x, width int) Window {
-	return I(i).GetVerticalWindow(x, width)
+	return Image(i).GetVerticalWindow(x, width)
 }
 
 // Sum returns the sum of all pixels in a Window
@@ -196,7 +196,7 @@ func (w Window) Proportion() float64 {
 // MeanStdDevWindow calculates the mean and standard deviation of
 // a section on an Integral Image, using the corresponding Square
 // Integral Image.
-func MeanStdDevWindow(i I, sq SqImage, x, y, size int) (float64, float64) {
+func MeanStdDevWindow(i Image, sq SqImage, x, y, size int) (float64, float64) {
 	imean := i.GetWindow(x, y, size).Mean()
 	smean := sq.GetWindow(x, y, size).Mean()
 
