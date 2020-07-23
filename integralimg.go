@@ -221,6 +221,10 @@ func (i I) GetWindow(x, y, size int) Window {
 	return Window { i[miny][minx], i[miny][maxx], i[maxy][minx], i[maxy][maxx], maxx-minx, maxy-miny}
 }
 
+func (i SqImage) GetWindow(x, y, size int) Window {
+	return I(i).GetWindow(x, y, size)
+}
+
 // GetVerticalWindow gets the values of the corners of a vertical
 // slice of an Integral Image, starting at x
 func (i I) GetVerticalWindow(x, width int) Window {
@@ -231,6 +235,10 @@ func (i I) GetVerticalWindow(x, width int) Window {
 	}
 
 	return Window { i[0][x], i[0][maxx], i[maxy][x], i[maxy][maxx], width, maxy }
+}
+
+func (i SqImage) GetVerticalWindow(x, width int) Window {
+	return I(i).GetVerticalWindow(x, width)
 }
 
 // Sum returns the sum of all pixels in a Window
