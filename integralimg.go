@@ -28,20 +28,48 @@ func (i I) At(x, y int) color.Color {
 		return color.Gray{}
 	}
 
-	var oldx, oldy, oldxy uint64
-	oldx, oldy, oldxy = 0, 0, 0
+	var prevx, prevy, prevxy uint64
+	prevx, prevy, prevxy = 0, 0, 0
 	if x > 0 {
-		oldx = i[y][x-1]
+		prevx = i[y][x-1]
 	}
 	if y > 0 {
-		oldy = i[y-1][x]
+		prevy = i[y-1][x]
 	}
 	if x > 0 && y > 0 {
-		oldxy = i[y-1][x-1]
+		prevxy = i[y-1][x-1]
 	}
-	orig := i[y][x] + oldxy - oldx - oldy
+	orig := i[y][x] + prevxy - prevx - prevy
 
 	return color.Gray{uint8(orig)}
+}
+
+func (i I) Set(x, y int, c color.Color) {
+	var prevx, prevy, prevxy uint64
+	prevx, prevy, prevxy = 0, 0, 0
+	if x > 0 {
+		prevx = i[y][x-1]
+	}
+	if y > 0 {
+		prevy = i[y-1][x]
+	}
+	if x > 0 && y > 0 {
+		prevxy = i[y-1][x-1]
+	}
+	gray := color.GrayModel.Convert(c).(color.Gray).Y
+	final := uint64(gray) + prevx + prevy - prevxy
+	i[y][x] = final
+}
+
+// NewImage returns a new Integral Image with the given bounds.
+func NewImage(r image.Rectangle) *I {
+	w, h := r.Dx(), r.Dy()
+	var rows I
+	for i := 0; i < h; i++ {
+		col := make([]uint64, w)
+		rows = append(rows, col)
+	}
+	return &rows
 }
 
 // Sq contains an Integral Image and its Square

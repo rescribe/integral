@@ -23,10 +23,9 @@ func TestFromPNG(t *testing.T) {
 		t.Fatalf("Could not decode image: %v\n", err)
 	}
 	b := img.Bounds()
-	gray := image.NewGray(image.Rect(0, 0, b.Dx(), b.Dy()))
-	draw.Draw(gray, b, img, b.Min, draw.Src)
 
-	integral := ToIntegralImg(gray)
+	integral := NewImage(image.Rect(0, 0, b.Dx(), b.Dy()))
+	draw.Draw(integral, b, img, b.Min, draw.Src)
 
 	if !imgsequal(img, integral) {
 		t.Errorf("Read png image differs to integral\n")
