@@ -17,15 +17,24 @@ import (
 // I is the Integral Image
 type I [][]uint64
 
-func (i I) ColorModel() color.Model { return color.GrayModel }
+// SqImage is a Square integral Image.
+// A squared integral image is an integral image for which the square of
+// each pixel is saved; this is useful for efficiently calculating
+// Standard Deviation.
+type SqImage [][]uint64
+
+func (i I) ColorModel() color.Model { return color.Gray16Model }
 
 func (i I) Bounds() image.Rectangle {
 	return image.Rectangle {image.Point{0, 0}, image.Point{len(i[0]), len(i)}}
 }
 
-func (i I) At(x, y int) color.Color {
+// at64 is used to return the raw uint64 for a given pixel. Accessing
+// this separately to a (potentially lossy) conversion to a Gray16 is
+// necessary for SqImage to function accurately.
+func (i I) at64(x, y int) uint64 {
 	if !(image.Point{x, y}.In(i.Bounds())) {
-		return color.Gray{}
+		return 0
 	}
 
 	var prevx, prevy, prevxy uint64
@@ -40,11 +49,15 @@ func (i I) At(x, y int) color.Color {
 		prevxy = i[y-1][x-1]
 	}
 	orig := i[y][x] + prevxy - prevx - prevy
-
-	return color.Gray{uint8(orig)}
+	return orig
 }
 
-func (i I) Set(x, y int, c color.Color) {
+func (i I) At(x, y int) color.Color {
+	c := i.at64(x, y)
+	return color.Gray16{uint16(c)}
+}
+
+func (i I) set64(x, y int, c uint64) {
 	var prevx, prevy, prevxy uint64
 	prevx, prevy, prevxy = 0, 0, 0
 	if x > 0 {
@@ -56,12 +69,16 @@ func (i I) Set(x, y int, c color.Color) {
 	if x > 0 && y > 0 {
 		prevxy = i[y-1][x-1]
 	}
-	gray := color.GrayModel.Convert(c).(color.Gray).Y
-	final := uint64(gray) + prevx + prevy - prevxy
+	final := c + prevx + prevy - prevxy
 	i[y][x] = final
 }
 
-// NewImage returns a new Integral Image with the given bounds.
+func (i I) Set(x, y int, c color.Color) {
+	gray := color.Gray16Model.Convert(c).(color.Gray16).Y
+	i.set64(x, y, uint64(gray))
+}
+
+// NewImage returns a new integral Image with the given bounds.
 func NewImage(r image.Rectangle) *I {
 	w, h := r.Dx(), r.Dy()
 	var rows I
@@ -70,6 +87,30 @@ func NewImage(r image.Rectangle) *I {
 		rows = append(rows, col)
 	}
 	return &rows
+}
+
+func (i SqImage) ColorModel() color.Model { return I(i).ColorModel() }
+
+func (i SqImage) Bounds() image.Rectangle {
+	return I(i).Bounds()
+}
+
+func (i SqImage) At(x, y int) color.Color {
+	c := I(i).at64(x, y)
+	rt := math.Sqrt(float64(c))
+	return color.Gray16{uint16(rt)}
+}
+
+func (i SqImage) Set(x, y int, c color.Color) {
+	gray := uint64(color.Gray16Model.Convert(c).(color.Gray16).Y)
+	I(i).set64(x, y, gray * gray)
+}
+
+// NewSqImage returns a new squared integral Image with the given bounds.
+func NewSqImage(r image.Rectangle) *SqImage {
+	i := NewImage(r)
+	s := SqImage(*i)
+	return &s
 }
 
 // Sq contains an Integral Image and its Square
