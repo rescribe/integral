@@ -24,7 +24,7 @@ func TestFromPNG(t *testing.T) {
 	}
 	b := img.Bounds()
 
-	integral := NewImage(image.Rect(0, 0, b.Dx(), b.Dy()))
+	integral := NewImage(b)
 	draw.Draw(integral, b, img, b.Min, draw.Src)
 
 	if !imgsequal(img, integral) {
@@ -44,7 +44,7 @@ func TestSqFromPNG(t *testing.T) {
 	}
 	b := img.Bounds()
 
-	integral := NewSqImage(image.Rect(0, 0, b.Dx(), b.Dy()))
+	integral := NewSqImage(b)
 	draw.Draw(integral, b, img, b.Min, draw.Src)
 
 	if !imgsequal(img, integral) {
