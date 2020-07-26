@@ -38,7 +38,7 @@ type SqImage [][]uint64
 func (i Image) ColorModel() color.Model { return color.Gray16Model }
 
 func (i Image) Bounds() image.Rectangle {
-	return image.Rectangle {image.Point{0, 0}, image.Point{len(i[0]), len(i)}}
+	return image.Rect(0, 0, len(i[0]), len(i))
 }
 
 // at64 is used to return the raw uint64 for a given pixel. Accessing
@@ -123,6 +123,86 @@ func NewSqImage(r image.Rectangle) *SqImage {
 	i := NewImage(r)
 	s := SqImage(*i)
 	return &s
+}
+
+func lowest(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func highest(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func (i Image) topLeft(r image.Rectangle) uint64 {
+	x := highest(r.Min.X, 0)
+	y := highest(r.Min.Y, 0)
+	return i[y][x]
+}
+
+func (i Image) topRight(r image.Rectangle) uint64 {
+	x := lowest(r.Max.X, i.Bounds().Dx() - 1)
+	y := highest(r.Min.Y, 0)
+	return i[y][x]
+}
+
+func (i Image) bottomLeft(r image.Rectangle) uint64 {
+	x := highest(r.Min.X, 0)
+	y := lowest(r.Max.Y, i.Bounds().Dy() - 1)
+	return i[y][x]
+}
+
+func (i Image) bottomRight(r image.Rectangle) uint64 {
+	x := lowest(r.Max.X, i.Bounds().Dx() - 1)
+	y := lowest(r.Max.Y, i.Bounds().Dy() - 1)
+	return i[y][x]
+}
+
+// Sum returns the sum of all pixels in a rectangle
+func (i Image) Sum(r image.Rectangle) uint64 {
+	return i.bottomRight(r) + i.topLeft(r) - i.topRight(r) - i.bottomLeft(r)
+}
+
+// Mean returns the average value of pixels in a rectangle
+func (i Image) Mean(r image.Rectangle) float64 {
+	in := r.Intersect(i.Bounds())
+	return float64(i.Sum(r)) / float64(in.Dx() * in.Dy())
+}
+
+// Sum returns the sum of all pixels in a rectangle
+func (i SqImage) Sum(r image.Rectangle) uint64 {
+	return Image(i).Sum(r)
+}
+
+// Mean returns the average value of pixels in a rectangle
+func (i SqImage) Mean(r image.Rectangle) float64 {
+	return Image(i).Mean(r)
+}
+
+// Proportion returns the proportion of pixels which are not white
+func (i Image) ProportionNotWhite(r image.Rectangle) float64 {
+	in := r.Intersect(i.Bounds())
+	area := in.Dx() * in.Dy()
+	// 1 << 16 - 1 as we're using Gray16, so 1 << 16 - 1 = white
+	sum := float64(i.Sum(r)) / float64(1 << 16 - 1)
+	return 1 - float64(area) / float64(sum)
+}
+
+// MeanStdDev calculates the mean and standard deviation of a
+// section of an image, using the corresponding regular and square
+// integral images.
+func MeanStdDev(i Image, sq SqImage, r image.Rectangle) (float64, float64) {
+	imean := i.Mean(r)
+	smean := sq.Mean(r)
+
+	variance := smean - (imean * imean)
+
+	return imean, math.Sqrt(variance)
 }
 
 // Window is a section of an Integral Image
