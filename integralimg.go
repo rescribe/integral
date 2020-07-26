@@ -1,4 +1,4 @@
-// Copyright 2019 Nick White.
+// Copyright 2020 Nick White.
 // Use of this source code is governed by the GPLv3
 // license that can be found in the LICENSE file.
 
@@ -15,9 +15,9 @@
 //     integral := integralimg.NewImage(b)
 //     draw.Draw(integral, b, img, b.Min, draw.Src)
 //
-// This package also defines a Window, which is a rectangular
-// section of an integral image. This has several methods to do
-// useful calculations on the part of the image represented.
+// The Sum(), Mean() and MeanStdDev() functions provided for the
+// integral versions of Images significantly speed up many common
+// image processing operations.
 package integralimg
 
 import (
@@ -184,115 +184,12 @@ func (i SqImage) Mean(r image.Rectangle) float64 {
 	return Image(i).Mean(r)
 }
 
-// Proportion returns the proportion of pixels which are not white
-func (i Image) ProportionNotWhite(r image.Rectangle) float64 {
-	in := r.Intersect(i.Bounds())
-	area := in.Dx() * in.Dy()
-	// 1 << 16 - 1 as we're using Gray16, so 1 << 16 - 1 = white
-	sum := float64(i.Sum(r)) / float64(1 << 16 - 1)
-	return 1 - float64(area) / float64(sum)
-}
-
 // MeanStdDev calculates the mean and standard deviation of a
 // section of an image, using the corresponding regular and square
 // integral images.
 func MeanStdDev(i Image, sq SqImage, r image.Rectangle) (float64, float64) {
 	imean := i.Mean(r)
 	smean := sq.Mean(r)
-
-	variance := smean - (imean * imean)
-
-	return imean, math.Sqrt(variance)
-}
-
-// Window is a section of an Integral Image
-type Window struct {
-	topleft uint64
-	topright uint64
-	bottomleft uint64
-	bottomright uint64
-	width int
-	height int
-}
-
-// GetWindow gets the values of the corners of a square part of an
-// Integral Image, plus the dimensions of the part, which can
-// be used to quickly calculate the mean of the area
-func (i Image) GetWindow(x, y, size int) Window {
-	step := size / 2
-
-	minx, miny := 0, 0
-	maxy := i.Bounds().Dy() - 1
-	maxx := i.Bounds().Dx() - 1
-
-	if y > (step+1) {
-		miny = y - step - 1
-	}
-	if x > (step+1) {
-		minx = x - step - 1
-	}
-
-	if maxy > (y + step) {
-		maxy = y + step
-	}
-	if maxx > (x + step) {
-		maxx = x + step
-	}
-
-	return Window { i[miny][minx], i[miny][maxx], i[maxy][minx], i[maxy][maxx], maxx-minx, maxy-miny}
-}
-
-func (i SqImage) GetWindow(x, y, size int) Window {
-	return Image(i).GetWindow(x, y, size)
-}
-
-// GetVerticalWindow gets the values of the corners of a vertical
-// slice of an Integral Image, starting at x
-func (i Image) GetVerticalWindow(x, width int) Window {
-	maxy := i.Bounds().Dy() - 1
-	xbound := i.Bounds().Dx() - 1
-	maxx := x + width
-	if maxx > xbound {
-		maxx = xbound
-	}
-
-	return Window { i[0][x], i[0][maxx], i[maxy][x], i[maxy][maxx], width, maxy }
-}
-
-func (i SqImage) GetVerticalWindow(x, width int) Window {
-	return Image(i).GetVerticalWindow(x, width)
-}
-
-// Sum returns the sum of all pixels in a Window
-func (w Window) Sum() uint64 {
-	return w.bottomright + w.topleft - w.topright - w.bottomleft
-}
-
-// Size returns the total size of a Window
-func (w Window) Size() int {
-	return w.width * w.height
-}
-
-// Mean returns the average value of pixels in a Window
-func (w Window) Mean() float64 {
-	return float64(w.Sum()) / float64(w.Size())
-}
-
-// Proportion returns the proportion of pixels which are on
-func (w Window) Proportion() float64 {
-	area := w.width * w.height
-	// 1 << 16 - 1 as we're using Gray16, so for a binarised
-	// image then 1 << 16 - 1 = on
-	sum := float64(w.Sum()) / float64(1 << 16 - 1)
-	return float64(area) / float64(sum) - 1
-}
-
-// MeanStdDevWindow calculates the mean and standard deviation of
-// a section on an Integral Image, using the corresponding Square
-// Integral Image.
-func MeanStdDevWindow(i Image, sq SqImage, x, y, size int) (float64, float64) {
-	imean := i.GetWindow(x, y, size).Mean()
-	smean := sq.GetWindow(x, y, size).Mean()
 
 	variance := smean - (imean * imean)
 
