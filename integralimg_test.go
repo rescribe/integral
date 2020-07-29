@@ -52,6 +52,32 @@ func TestSqFromPNG(t *testing.T) {
 	}
 }
 
+func TestSum(t *testing.T) {
+	f, err := os.Open("testdata/in.png")
+	if err != nil {
+		t.Fatalf("Could not open file %s: %v\n", "testdata/in.png", err)
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		t.Fatalf("Could not decode image: %v\n", err)
+	}
+	b := img.Bounds()
+
+	imgplus := newGray16Plus(b)
+	integral := NewImage(b)
+
+	draw.Draw(imgplus, b, img, b.Min, draw.Src)
+	draw.Draw(integral, b, img, b.Min, draw.Src)
+
+	sumimg := imgplus.sum(b)
+	sumint := integral.Sum(b)
+
+	if sumimg != sumint {
+		t.Errorf("Sum of integral image differs to regular image: regular: %d, integral: %d\n", sumimg, sumint)
+	}
+}
+
 func imgsequal(img1, img2 image.Image) bool {
 	b := img1.Bounds()
 	if !b.Eq(img2.Bounds()) {
@@ -76,4 +102,25 @@ func imgsequal(img1, img2 image.Image) bool {
 		}
 	}
 	return true
+}
+
+type grayPlus struct {
+	image.Gray16
+}
+
+func newGray16Plus(r image.Rectangle) *grayPlus {
+	var g grayPlus
+	g.Gray16 = *image.NewGray16(r)
+	return &g
+}
+
+func (i grayPlus) sum(r image.Rectangle) uint64 {
+	var sum uint64
+	for y := r.Min.Y; y < r.Max.Y; y++ {
+		for x := r.Min.X; x < r.Max.X; x++ {
+			c := i.Gray16At(x, y).Y
+			sum += uint64(c)
+		}
+	}
+	return sum
 }
