@@ -70,11 +70,25 @@ func TestSum(t *testing.T) {
 	draw.Draw(imgplus, b, img, b.Min, draw.Src)
 	draw.Draw(integral, b, img, b.Min, draw.Src)
 
-	sumimg := imgplus.sum(b)
-	sumint := integral.Sum(b)
+	cases := []struct {
+		name string
+		r    image.Rectangle
+	}{
+		{"fullimage", b},
+		{"small", image.Rect(1, 1, 5, 5)},
+		{"toobig", image.Rect(0, 0, 2000, b.Dy())},
+		{"toosmall", image.Rect(-1, -1, 4, 5)},
+		{"small2", image.Rect(0, 0, 4, 4)},
+	}
 
-	if sumimg != sumint {
-		t.Errorf("Sum of integral image differs to regular image: regular: %d, integral: %d\n", sumimg, sumint)
+	for _, c := range cases{
+		t.Run(c.name, func(t *testing.T) {
+			sumimg := imgplus.sum(c.r)
+			sumint := integral.Sum(c.r)
+			if sumimg != sumint {
+				t.Errorf("Sum of integral image differs to regular image: regular: %d, integral: %d\n", sumimg, sumint)
+			}
+		})
 	}
 }
 

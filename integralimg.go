@@ -140,38 +140,43 @@ func highest(a, b int) int {
 }
 
 func (i Image) topLeft(r image.Rectangle) uint64 {
-	x := highest(r.Min.X, 0)
-	y := highest(r.Min.Y, 0)
-	if x == 0 || y == 0 {
+	b := i.Bounds()
+	x := r.Min.X - 1
+	y := r.Min.Y - 1
+	x = lowest(x, b.Max.X - 1)
+	y = lowest(y, b.Max.Y - 1)
+	if x < 0 || y < 0 {
 		return 0
 	}
 	return i[y][x]
 }
 
 func (i Image) topRight(r image.Rectangle) uint64 {
-	x := lowest(r.Max.X - 1, i.Bounds().Dx() - 1)
-	y := highest(r.Min.Y, 0)
-	if x == 0 || y == 0 {
+	b := i.Bounds()
+	x := lowest(r.Max.X - 1, b.Max.X - 1)
+	y := r.Min.Y - 1
+	y = lowest(y, b.Max.Y - 1)
+	if x < 0 || y < 0 {
 		return 0
 	}
 	return i[y][x]
 }
 
 func (i Image) bottomLeft(r image.Rectangle) uint64 {
-	x := highest(r.Min.X, 0)
-	y := lowest(r.Max.Y - 1, i.Bounds().Dy() - 1)
-	if x == 0 || y == 0 {
+	b := i.Bounds()
+	x := r.Min.X - 1
+	x = lowest(x, b.Max.X - 1)
+	y := lowest(r.Max.Y - 1, b.Max.Y - 1)
+	if x < 0 || y < 0 {
 		return 0
 	}
 	return i[y][x]
 }
 
 func (i Image) bottomRight(r image.Rectangle) uint64 {
-	x := lowest(r.Max.X - 1, i.Bounds().Dx() - 1)
-	y := lowest(r.Max.Y - 1, i.Bounds().Dy() - 1)
-	if x == 0 || y == 0 {
-		return 0
-	}
+	b := i.Bounds()
+	x := lowest(r.Max.X - 1, b.Max.X - 1)
+	y := lowest(r.Max.Y - 1, b.Max.Y - 1)
 	return i[y][x]
 }
 
