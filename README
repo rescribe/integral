@@ -11,17 +11,6 @@ by running `go get rescribe.xyz/integralimg` and documentation
 can be read with the `go doc` command or online at
 <https://pkg.go.dev/rescribe.xyz/integralimg>.
 
-## Bugs
-
-The standard deviation and mean functions don't produce precisely
-the same result as those run on non integral images. The difference
-is small enough that it has little effect for most uses, but it
-ought to be identical.
-
-## TODO
-
-Write tests for the package.
-
 ## Contributions
 
 Any and all comments, bug reports, patches or pull requests would

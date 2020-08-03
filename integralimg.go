@@ -180,23 +180,23 @@ func (i Image) bottomRight(r image.Rectangle) uint64 {
 	return i[y][x]
 }
 
-// Sum returns the sum of all pixels in a rectangle
+// Sum returns the sum of all pixels in a section of an image
 func (i Image) Sum(r image.Rectangle) uint64 {
 	return i.bottomRight(r) + i.topLeft(r) - i.topRight(r) - i.bottomLeft(r)
 }
 
-// Mean returns the average value of pixels in a rectangle
+// Mean returns the average value of pixels in a section of an image
 func (i Image) Mean(r image.Rectangle) float64 {
 	in := r.Intersect(i.Bounds())
 	return float64(i.Sum(r)) / float64(in.Dx()*in.Dy())
 }
 
-// Sum returns the sum of all pixels in a rectangle
+// Sum returns the sum of all pixels in a section of an image
 func (i SqImage) Sum(r image.Rectangle) uint64 {
 	return Image(i).Sum(r)
 }
 
-// Mean returns the average value of pixels in a rectangle
+// Mean returns the average value of pixels in a section of an image
 func (i SqImage) Mean(r image.Rectangle) float64 {
 	return Image(i).Mean(r)
 }
