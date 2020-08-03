@@ -92,6 +92,46 @@ func TestSum(t *testing.T) {
 	}
 }
 
+func TestMean(t *testing.T) {
+	f, err := os.Open("testdata/in.png")
+	if err != nil {
+		t.Fatalf("Could not open file %s: %v\n", "testdata/in.png", err)
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		t.Fatalf("Could not decode image: %v\n", err)
+	}
+	b := img.Bounds()
+
+	imgplus := newGray16Plus(b)
+	integral := NewImage(b)
+
+	draw.Draw(imgplus, b, img, b.Min, draw.Src)
+	draw.Draw(integral, b, img, b.Min, draw.Src)
+
+	cases := []struct {
+		name string
+		r    image.Rectangle
+	}{
+		{"fullimage", b},
+		{"small", image.Rect(1, 1, 5, 5)},
+		{"toobig", image.Rect(0, 0, 2000, b.Dy())},
+		{"toosmall", image.Rect(-1, -1, 4, 5)},
+		{"small2", image.Rect(0, 0, 4, 4)},
+	}
+
+	for _, c := range cases{
+		t.Run(c.name, func(t *testing.T) {
+			meanimg := imgplus.mean(c.r)
+			meanint := integral.Mean(c.r)
+			if meanimg != meanint {
+				t.Errorf("Mean of integral image differs to regular image: regular: %f, integral: %f\n", meanimg, meanint)
+			}
+		})
+	}
+}
+
 func imgsequal(img1, img2 image.Image) bool {
 	b := img1.Bounds()
 	if !b.Eq(img2.Bounds()) {
@@ -137,4 +177,9 @@ func (i grayPlus) sum(r image.Rectangle) uint64 {
 		}
 	}
 	return sum
+}
+
+func (i grayPlus) mean(r image.Rectangle) float64 {
+	in := r.Intersect(i.Bounds())
+	return float64(i.sum(r)) / float64(in.Dx() * in.Dy())
 }
