@@ -7,9 +7,16 @@
 // sum of pixels to the left and above each pixel, which can make
 // several common image processing operations much faster.
 //
-// The Sum(), Mean() and MeanStdDev() functions provided for the
-// integral versions of Images significantly speed up many common
-// image processing operations.
+// A lot of image processing operations rely on many calculations
+// of the sum or mean of a set of pixels. As these have been
+// precalculated for an integral Image, these calculations are
+// much faster. Image.Sum() and Image.Mean() functions are provided
+// by this package to take advantage of this.
+//
+// Another common requirement is standard deviation over an area
+// of an image. This can be calculated by creating an integral
+// Image and squared integral Image (SqImage) for a base image, and
+// passing them to the MeanStdDev() function provided.
 package integralimg
 
 import (
