@@ -81,7 +81,7 @@ func TestSum(t *testing.T) {
 		{"small2", image.Rect(0, 0, 4, 4)},
 	}
 
-	for _, c := range cases{
+	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			sumimg := imgplus.sum(c.r)
 			sumint := integral.Sum(c.r)
@@ -121,7 +121,7 @@ func TestMean(t *testing.T) {
 		{"small2", image.Rect(0, 0, 4, 4)},
 	}
 
-	for _, c := range cases{
+	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			meanimg := imgplus.mean(c.r)
 			meanint := integral.Mean(c.r)
@@ -181,5 +181,5 @@ func (i grayPlus) sum(r image.Rectangle) uint64 {
 
 func (i grayPlus) mean(r image.Rectangle) float64 {
 	in := r.Intersect(i.Bounds())
-	return float64(i.sum(r)) / float64(in.Dx() * in.Dy())
+	return float64(i.sum(r)) / float64(in.Dx()*in.Dy())
 }

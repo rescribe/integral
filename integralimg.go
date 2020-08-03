@@ -115,7 +115,7 @@ func (i SqImage) At(x, y int) color.Color {
 
 func (i SqImage) Set(x, y int, c color.Color) {
 	gray := uint64(color.Gray16Model.Convert(c).(color.Gray16).Y)
-	Image(i).set64(x, y, gray * gray)
+	Image(i).set64(x, y, gray*gray)
 }
 
 // NewSqImage returns a new squared integral Image with the given bounds.
@@ -143,8 +143,8 @@ func (i Image) topLeft(r image.Rectangle) uint64 {
 	b := i.Bounds()
 	x := r.Min.X - 1
 	y := r.Min.Y - 1
-	x = lowest(x, b.Max.X - 1)
-	y = lowest(y, b.Max.Y - 1)
+	x = lowest(x, b.Max.X-1)
+	y = lowest(y, b.Max.Y-1)
 	if x < 0 || y < 0 {
 		return 0
 	}
@@ -153,9 +153,9 @@ func (i Image) topLeft(r image.Rectangle) uint64 {
 
 func (i Image) topRight(r image.Rectangle) uint64 {
 	b := i.Bounds()
-	x := lowest(r.Max.X - 1, b.Max.X - 1)
+	x := lowest(r.Max.X-1, b.Max.X-1)
 	y := r.Min.Y - 1
-	y = lowest(y, b.Max.Y - 1)
+	y = lowest(y, b.Max.Y-1)
 	if x < 0 || y < 0 {
 		return 0
 	}
@@ -165,8 +165,8 @@ func (i Image) topRight(r image.Rectangle) uint64 {
 func (i Image) bottomLeft(r image.Rectangle) uint64 {
 	b := i.Bounds()
 	x := r.Min.X - 1
-	x = lowest(x, b.Max.X - 1)
-	y := lowest(r.Max.Y - 1, b.Max.Y - 1)
+	x = lowest(x, b.Max.X-1)
+	y := lowest(r.Max.Y-1, b.Max.Y-1)
 	if x < 0 || y < 0 {
 		return 0
 	}
@@ -175,8 +175,8 @@ func (i Image) bottomLeft(r image.Rectangle) uint64 {
 
 func (i Image) bottomRight(r image.Rectangle) uint64 {
 	b := i.Bounds()
-	x := lowest(r.Max.X - 1, b.Max.X - 1)
-	y := lowest(r.Max.Y - 1, b.Max.Y - 1)
+	x := lowest(r.Max.X-1, b.Max.X-1)
+	y := lowest(r.Max.Y-1, b.Max.Y-1)
 	return i[y][x]
 }
 
@@ -188,7 +188,7 @@ func (i Image) Sum(r image.Rectangle) uint64 {
 // Mean returns the average value of pixels in a rectangle
 func (i Image) Mean(r image.Rectangle) float64 {
 	in := r.Intersect(i.Bounds())
-	return float64(i.Sum(r)) / float64(in.Dx() * in.Dy())
+	return float64(i.Sum(r)) / float64(in.Dx()*in.Dy())
 }
 
 // Sum returns the sum of all pixels in a rectangle
