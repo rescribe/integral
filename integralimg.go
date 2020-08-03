@@ -7,14 +7,6 @@
 // sum of pixels to the left and above each pixel, which can make
 // several common image processing operations much faster.
 //
-// integralimg.Image and integralimg.SqImage fully implement the
-// image.Image and image/draw.Draw interfaces, and hence can be
-// used like so:
-//
-//     img, _, err := image.Decode(f)
-//     integral := integralimg.NewImage(b)
-//     draw.Draw(integral, b, img, b.Min, draw.Src)
-//
 // The Sum(), Mean() and MeanStdDev() functions provided for the
 // integral versions of Images significantly speed up many common
 // image processing operations.
