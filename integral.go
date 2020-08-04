@@ -2,22 +2,22 @@
 // Use of this source code is governed by the GPLv3
 // license that can be found in the LICENSE file.
 
-// integralimg is a package for processing integral images, aka
+// integral is a package for processing integral images, aka
 // summed area tables. These are structures which precompute the
 // sum of pixels to the left and above each pixel, which can make
 // several common image processing operations much faster.
 //
 // A lot of image processing operations rely on many calculations
 // of the sum or mean of a set of pixels. As these have been
-// precalculated for an integral Image, these calculations are
+// precalculated for an integral image, these calculations are
 // much faster. Image.Sum() and Image.Mean() functions are provided
 // by this package to take advantage of this.
 //
 // Another common requirement is standard deviation over an area
 // of an image. This can be calculated by creating an integral
-// Image and squared integral Image (SqImage) for a base image, and
+// image and squared integral image (SqImage) for a base image, and
 // passing them to the MeanStdDev() function provided.
-package integralimg
+package integral
 
 import (
 	"image"
@@ -25,10 +25,10 @@ import (
 	"math"
 )
 
-// Image is an integral Image
+// Image is an integral image
 type Image [][]uint64
 
-// SqImage is a Square integral Image.
+// SqImage is a Square integral image.
 // A squared integral image is an integral image for which the square of
 // each pixel is saved; this is useful for efficiently calculating
 // Standard Deviation.
@@ -89,7 +89,7 @@ func (i Image) Set(x, y int, c color.Color) {
 	i.set64(x, y, uint64(gray))
 }
 
-// NewImage returns a new integral Image with the given bounds.
+// NewImage returns a new integral image with the given bounds.
 func NewImage(r image.Rectangle) *Image {
 	w, h := r.Dx(), r.Dy()
 	var rows Image
@@ -117,7 +117,7 @@ func (i SqImage) Set(x, y int, c color.Color) {
 	Image(i).set64(x, y, gray*gray)
 }
 
-// NewSqImage returns a new squared integral Image with the given bounds.
+// NewSqImage returns a new squared integral image with the given bounds.
 func NewSqImage(r image.Rectangle) *SqImage {
 	i := NewImage(r)
 	s := SqImage(*i)

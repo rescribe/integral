@@ -1,3 +1,3 @@
-module rescribe.xyz/integralimg
+module rescribe.xyz/integral
 
 go 1.14

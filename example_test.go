@@ -2,7 +2,7 @@
 // Use of this source code is governed by the GPLv3
 // license that can be found in the LICENSE file.
 
-package integralimg_test
+package integral_test
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"rescribe.xyz/integralimg"
+	"rescribe.xyz/integral"
 )
 
 func ExampleImage_Sum() {
@@ -26,9 +26,9 @@ func ExampleImage_Sum() {
 		log.Fatal(err)
 	}
 	b := img.Bounds()
-	integral := integralimg.NewImage(b)
-	draw.Draw(integral, b, img, b.Min, draw.Src)
-	fmt.Printf("Sum: %d\n", integral.Sum(b))
+	in := integral.NewImage(b)
+	draw.Draw(in, b, img, b.Min, draw.Src)
+	fmt.Printf("Sum: %d\n", in.Sum(b))
 	// Output:
 	// Sum: 601340165
 }
@@ -44,9 +44,9 @@ func ExampleImage_Mean() {
 		log.Fatal(err)
 	}
 	b := img.Bounds()
-	integral := integralimg.NewImage(b)
-	draw.Draw(integral, b, img, b.Min, draw.Src)
-	fmt.Printf("Mean: %f\n", integral.Mean(b))
+	in := integral.NewImage(b)
+	draw.Draw(in, b, img, b.Min, draw.Src)
+	fmt.Printf("Mean: %f\n", in.Mean(b))
 	// Output:
 	// Mean: 54677.229042
 }
@@ -62,11 +62,11 @@ func ExampleMeanStdDev() {
 		log.Fatal(err)
 	}
 	b := img.Bounds()
-	integral := integralimg.NewImage(b)
-	sqIntegral := integralimg.NewSqImage(b)
-	draw.Draw(integral, b, img, b.Min, draw.Src)
-	draw.Draw(sqIntegral, b, img, b.Min, draw.Src)
-	mean, stddev := integralimg.MeanStdDev(*integral, *sqIntegral, b)
+	in := integral.NewImage(b)
+	sq := integral.NewSqImage(b)
+	draw.Draw(in, b, img, b.Min, draw.Src)
+	draw.Draw(sq, b, img, b.Min, draw.Src)
+	mean, stddev := integral.MeanStdDev(*in, *sq, b)
 	fmt.Printf("Mean: %f, Standard Deviation: %f\n", mean, stddev)
 	// Output:
 	// Mean: 54677.229042, Standard Deviation: 21643.721672
