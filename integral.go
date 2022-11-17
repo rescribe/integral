@@ -176,6 +176,9 @@ func (i Image) bottomRight(r image.Rectangle) uint64 {
 	b := i.Bounds()
 	x := lowest(r.Max.X-1, b.Max.X-1)
 	y := lowest(r.Max.Y-1, b.Max.Y-1)
+	if x < 0 || y < 0 {
+		return 0
+	}
 	return i[y][x]
 }
 
